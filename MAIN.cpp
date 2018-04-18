@@ -1,12 +1,4 @@
-/*
-Отключено консольное (главное) окно:
-	Linker ->  Advanced -> Entery Point := "mainCRTStartup"
-	Linker ->  System -> SubSystem := "Windows (/SUBSYSTEM:WINDOWS)"
-*/
-
-#include <stdlib.h>
-#include "glut.h"
-#include <vector>
+#include "Hook.h"
 using namespace std;
 
 GLint Width = 512, Height = 512;
