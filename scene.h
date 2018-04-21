@@ -36,8 +36,16 @@ public:
 	GLfloat blue;
 
 	Color();
-	Color(GLfloat _red, GLfloat _green, GLfloat _blue);
-	void add(GLfloat _red, GLfloat _green, GLfloat _blue);
+	Color(
+		GLfloat _red, 
+		GLfloat _green, 
+		GLfloat _blue
+	);
+	void add(
+		GLfloat _red, 
+		GLfloat _green,
+		GLfloat _blue)
+		;
 	void add(Color colr);
 	void add(Color colr, Color refl);
 };
@@ -69,8 +77,12 @@ public:
 	GLfloat Emission[4];	// Собственное излучение.
 	GLfloat Shininess;		// Коэффициент блеска.
 
-	Sphere();												 // Конструктор по умолчанию.
-	Sphere(GLfloat _radius, Vector3f _center, Color _color); // Конструктор.
+	Sphere();
+	Sphere(
+		GLfloat _radius, 
+		Vector3f _center, 
+		Color _color
+	);
 	void Draw();											 // Отрисовка сферы.
 	void DrawFrame();										 // Отрисовка каркаса сферы.
 
@@ -95,7 +107,11 @@ public:
 	GLfloat Shininess;		// Коэффициент блеска.
 
 	Tetrahedron();
-	Tetrahedron(Vector3f _coord[], Vector3f _center, Color _color);
+	Tetrahedron(
+		Vector3f _coord[], 
+		Vector3f _center, 
+		Color _color
+	);
 	void Draw();							// Отрисовка тетраэдра.
 	void DrawFrame();						// Отрисовка каркаса тетраэдра.
 

@@ -82,6 +82,7 @@
     <ClCompile Include="helpTracer.cpp" />
     <ClCompile Include="gauss.cpp" />
     <ClCompile Include="MAIN.cpp" />
+    <ClCompile Include="scene.cpp" />
     <ClCompile Include="tracer.cpp" />
     <ClCompile Include="normals.cpp" />
   </ItemGroup>

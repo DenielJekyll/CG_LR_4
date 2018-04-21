@@ -4,6 +4,7 @@
 #include "glut.h"
 #include "tracer.h"
 #include "helpTracer.h"
+#include "scene.h"
 #include <vector>
 #include <gl\gl.h>
 #include <cstdio>
