@@ -2,12 +2,10 @@
 #include <cmath>
 #include <windows.h>
 #include "glut.h"
-#include "tracer.h"
-#include "helpTracer.h"
-#include "scene.h"
 #include <vector>
 #include <gl\gl.h>
 #include <cstdio>
+#include "tracer.h"
 
 #define kSpeed  0.03f	//скорость перемещения камеры
 

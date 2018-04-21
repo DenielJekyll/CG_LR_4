@@ -60,4 +60,12 @@
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="scene_materials.txt">
+      <Filter>Файлы ресурсов</Filter>
+    </Text>
+    <Text Include="scene_objects.txt">
+      <Filter>Файлы ресурсов</Filter>
+    </Text>
+  </ItemGroup>
 </Project>

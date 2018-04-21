@@ -95,6 +95,10 @@
     <ClInclude Include="tracer.h" />
     <ClInclude Include="normals.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="scene_materials.txt" />
+    <Text Include="scene_objects.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
