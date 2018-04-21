@@ -1,6 +1,6 @@
 #include"gauss.h"
 
-void sol_gauss(double **A, double *b, double *x, int n)
+void solve_gauss(double **A, double *b, double *x, int n)
 {
 	int i, j;
 	double s;
