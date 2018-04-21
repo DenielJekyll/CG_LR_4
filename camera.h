@@ -7,7 +7,7 @@
 #include "glut.h" 
 #include <vector>
 #include <gl\gl.h>
-#include "normal.h"
+#include "normals.h"
 
 
 class Camera {

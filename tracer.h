@@ -2,7 +2,7 @@
 Интерфейс класса, отвечающего за трассировку лучей.
 */
 
-#include"scene.h"
+#include "scene.h"
 
 class Raytracer {
 public:

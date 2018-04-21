@@ -109,10 +109,10 @@ void Camera::SetViewByMouse(GLint width, GLint height) {
 			/*	Чтобы найти ось, вокруг которой нужно совершать вращение вверх и вниз, нужно
 				найти вектор, перпендикулярный вектору взгляда камеры и
 				вертикальному вектору */
-			Vector3f vAxis = Cross(View - Position, UpVector);
+			Vector3f vAxis = normal(View - Position, UpVector);
 
 			// Нормализуем ось.
-			vAxis = Normalize(vAxis);
+			vAxis = normalize(vAxis);
 
 			// Вращаем камеру вокруг нашей оси на заданный угол.
 			RotateView(1.0f - lastRotX, vAxis.x, vAxis.y, vAxis.z);
@@ -124,17 +124,17 @@ void Camera::SetViewByMouse(GLint width, GLint height) {
 		currentRotX = -1.0f;
 		if (lastRotX != -1.0f) {
 			// Вычисляем ось.
-			Vector3f vAxis = Cross(View - Position, UpVector);
+			Vector3f vAxis = normal(View - Position, UpVector);
 
 			// Нормализуем ось.
-			vAxis = Normalize(vAxis);
+			vAxis = normalize(vAxis);
 
 			// Вращаем.
 			RotateView(-1.0f - lastRotX, vAxis.x, vAxis.y, vAxis.z);
 		}
 	} else { // Если в пределах 1.0f -1.0f - просто вращаем.
-		Vector3f vAxis = Cross(View - Position, UpVector);
-		vAxis = Normalize(vAxis);
+		Vector3f vAxis = normal(View - Position, UpVector);
+		vAxis = normalize(vAxis);
 		RotateView(angleZ, vAxis.x, vAxis.y, vAxis.z);
 	}
 

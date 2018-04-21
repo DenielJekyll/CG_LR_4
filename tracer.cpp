@@ -32,13 +32,13 @@ void Raytracer::Raytrace() {
 	float tetha = 60 * (M_PI / 180.);	// Угол охвата.
 	float N = 0.1;						// Расстояние от точки взгляда, до ближней плоскости.
 	Vector3f n = camera.Position - camera.View;
-	Vector3f u = Cross(camera.UpVector, n);
-	Vector3f v = Cross(n, u);
+	Vector3f u = normal(camera.UpVector, n);
+	Vector3f v = normal(n, u);
 
 	// Нормализация с.к., связанной с камерой.
-	n = Normalize(n);
-	u = Normalize(u);
-	v = Normalize(v);
+	n = normalize(n);
+	u = normalize(u);
+	v = normalize(v);
 
 	float H = N * tan(tetha / 2.0);
 	float W = H * aspect;
@@ -77,7 +77,7 @@ void Raytracer::Raytrace() {
 					-N * n.y + x * u.y + y * v.y - coeff,
 					-N * n.z + x * u.z + y * v.z - coeff
 				);
-				direction = Normalize(direction);
+				direction = normalize(direction);
 				ray.SetDir(direction);
 				color.add(Shade(ray));
 
@@ -86,7 +86,7 @@ void Raytracer::Raytrace() {
 					-N * n.y + x * u.y + y * v.y + coeff,
 					-N * n.z + x * u.z + y * v.z - coeff
 				);
-				direction = Normalize(direction);
+				direction = normalize(direction);
 				ray.SetDir(direction);
 				color.add(Shade(ray));
 
@@ -190,7 +190,7 @@ Color Raytracer::Shade(Ray ray) {
 		-ray.dir.y, 
 		-ray.dir.z
 	);
-	v = Normalize(v);
+	v = normalize(v);
 
 	int typeObj = best.hit[0].objectType;	// Тип объекта.
 	int numObj = best.hit[0].objectNum;		// Номер объекта.
@@ -210,7 +210,7 @@ Color Raytracer::Shade(Ray ray) {
 		// Нормаль в точке соударения.
 		Vector3f normal;
 		normal = h.hitNormal;
-		normal = Normalize(normal);
+		normal = normalize(normal);
 
 		float eps = 0.0001;	// Малое число.
 		Ray feeler;			// Щуп теней.
@@ -237,7 +237,7 @@ Color Raytracer::Shade(Ray ray) {
 
 			// Вектор от точки соударения до источника.
 			Vector3f s = scene.vector_Light[i].position - h.hitPoint;
-			s = Normalize(s);
+			s = normalize(s);
 
 			// Член Ламберта.
 			float mDotS = scal(s, normal);
@@ -259,7 +259,7 @@ Color Raytracer::Shade(Ray ray) {
 			}
 
 			Vector3f _h = v + s;
-			_h = Normalize(_h);
+			_h = normalize(_h);
 
 			// Член Фонга.
 			float mDotH = scal(_h, normal);
@@ -288,7 +288,7 @@ Color Raytracer::Shade(Ray ray) {
 				Ray reflectedRay;	// Отраженный луч.
 				Vector3f reflDir = ray.dir - normal * scalar(ray.dir, normal) * 2;	// Направление отраженного луча.
 				reflectedRay.start = h.hitPoint - ray.dir*eps;						// Стартовая точка отраженного луча.
-				reflDir = Normalize(reflDir);
+				reflDir = normalize(reflDir);
 				reflectedRay.SetDir(reflDir);
 				reflectedRay.recurseLevel = ray.recurseLevel + 1;					// Увеличить уровень рекурсии.
 				Color c = Color(
@@ -313,7 +313,7 @@ Color Raytracer::Shade(Ray ray) {
 		// Нормаль в точке соударения.
 		Vector3f normal;
 		normal = h.hitNormal;
-		normal = Normalize(normal);
+		normal = normalize(normal);
 
 		float eps = 0.0001;	// Малое число.
 		Ray feeler;			// Щуп теней.
@@ -344,7 +344,7 @@ Color Raytracer::Shade(Ray ray) {
 
 			// Вектор от точки соударения до источника.
 			Vector3f s = scene.vector_Light[i].position - h.hitPoint;
-			s = Normalize(s);
+			s = normalize(s);
 
 			// Член Ламберта.
 			float mDotS = scal(s, normal);
@@ -362,7 +362,7 @@ Color Raytracer::Shade(Ray ray) {
 			}
 
 			Vector3f _h = v + s;
-			_h = Normalize(_h);
+			_h = normalize(_h);
 
 			// Член Фонга.
 			float mDotH = scal(_h, normal);
@@ -391,7 +391,7 @@ Color Raytracer::Shade(Ray ray) {
 				Ray reflectedRay;
 				Vector3f reflDir = ray.dir - normal * scalar(ray.dir, normal)*2.0;	// Направление отраженного луча.
 				reflectedRay.start = h.hitPoint - ray.dir*eps;						// Стартовая точка отраженного луча.
-				reflDir = Normalize(reflDir);
+				reflDir = normalize(reflDir);
 				reflectedRay.SetDir(reflDir);
 				reflectedRay.recurseLevel = ray.recurseLevel + 1;
 				Color c = Color(
@@ -416,7 +416,7 @@ Color Raytracer::Shade(Ray ray) {
 		// Нормаль в точке соударения.
 		Vector3f normal;
 		normal = h.hitNormal;
-		normal = Normalize(normal);
+		normal = normalize(normal);
 
 		float eps = 0.0001;	// Малое число.
 		Ray feeler;			// Щуп теней.
@@ -443,7 +443,7 @@ Color Raytracer::Shade(Ray ray) {
 
 			// Вектор от точки соударения до источника.
 			Vector3f s = scene.vector_Light[i].position - h.hitPoint;
-			s = Normalize(s);
+			s = normalize(s);
 
 			// Член Ламберта.
 			float mDotS = scal(s, normal);
@@ -465,7 +465,7 @@ Color Raytracer::Shade(Ray ray) {
 			}
 
 			Vector3f _h = v + s;
-			_h = Normalize(_h);
+			_h = normalize(_h);
 
 			// Член Фонга.
 			float mDotH = scal(_h, normal);
@@ -490,7 +490,7 @@ Color Raytracer::Shade(Ray ray) {
 				Ray reflectedRay;
 				Vector3f reflDir = ray.dir - normal * scalar(ray.dir, normal) * 2;
 				reflectedRay.start = h.hitPoint - ray.dir*eps;
-				reflDir = Normalize(reflDir);
+				reflDir = normalize(reflDir);
 				reflectedRay.SetDir(reflDir);
 				reflectedRay.recurseLevel = ray.recurseLevel + 1;
 				Color c = Color(
