@@ -79,6 +79,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="MAIN.cpp" />
+    <ClCompile Include="normals.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Hook.h" />
