@@ -2,6 +2,8 @@
 #include <cmath>
 #include <windows.h>
 #include "glut.h"
+#include "tracer.h"
+#include "helpTracer.h"
 #include <vector>
 #include <gl\gl.h>
 #include <cstdio>

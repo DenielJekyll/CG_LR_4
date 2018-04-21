@@ -78,6 +78,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="helpTracer.cpp" />
     <ClCompile Include="MAIN.cpp" />
     <ClCompile Include="tracer.cpp" />
   </ItemGroup>
