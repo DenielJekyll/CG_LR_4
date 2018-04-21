@@ -78,6 +78,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="gauss.cpp" />
     <ClCompile Include="MAIN.cpp" />
     <ClCompile Include="normals.cpp" />
   </ItemGroup>
