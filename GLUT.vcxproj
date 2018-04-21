@@ -83,6 +83,7 @@
     <ClCompile Include="tracer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="camera.h" />
     <ClInclude Include="helpTracer.h" />
     <ClInclude Include="Hook.h" />
     <ClInclude Include="tracer.h" />
