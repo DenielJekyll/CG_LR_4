@@ -15,7 +15,7 @@ using namespace std;
 //=============Для преобразования луча к базовому виду==============
 
 // Определить матрицу трансформирования.
-void makeTransformMatrix(double **TMatrix, Vector3f shift, float scale);
+void makeTransformMatrix(double **TMatrix, Vector3f shift, GLfloat scaleX, GLfloat scaleY, GLfloat scaleZ);
 
 // Перевод луча к базовому виду.
 Ray transformRay(Ray _ray, Vector3f shift, GLfloat scaleX, GLfloat scaleY, GLfloat scaleZ);

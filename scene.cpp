@@ -488,7 +488,7 @@ bool Tetrahedron::hitPlane(Ray ray, int ver1, int ver2, int ver3, Vector3f &_N, 
 	A = coord[ver1];
 	B = coord[ver2];
 	C = coord[ver3];
-	N = Normal(A, B, C);
+	N = count_normal_for_polygon(A, B, C);
 
 	float vn = scalar(Dir, N);
 
@@ -897,8 +897,8 @@ Ray transformRay(Ray _ray, Vector3f shift, GLfloat scaleX, GLfloat scaleY, GLflo
 	double sol_dir[4];
 
 	// Ќайти базовые координаты начала луча и его направлени€.
-	sol_gauss(TMatrix, point, sol_point, 4);
-	sol_gauss(TMatrix, dir, sol_dir, 4);
+	solve_gauss(TMatrix, point, sol_point, 4);
+	solve_gauss(TMatrix, dir, sol_dir, 4);
 
 	// ѕеревести в обычные координаты.
 	Vector3f newPoint = Vector3f(sol_point[0], sol_point[1], sol_point[2]);

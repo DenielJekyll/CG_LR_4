@@ -37,7 +37,7 @@ void transform(double **A, double *x, int i, int n)
 	int gl = i;
 	int j;
 	for (j = i + 1; j<n; j++)
-		if (abs(A[j][i])>abs(max))
+		if (fabs(A[j][i])>fabs(max))
 		{
 			max = A[j][i];
 			gl = j;
