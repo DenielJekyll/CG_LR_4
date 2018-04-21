@@ -1,149 +1,290 @@
 #include "Hook.h"
-using namespace std;
 
-GLint Width = 512, Height = 512;
-GLubyte ColorR = 0, ColorG = 0, ColorB = 0;
-GLubyte PointSize = 5;
-
-enum keys { Empty, KeyR, KeyG, KeyB, KeyW, KeyA, KeyS, KeyD, KeyU,KeyI };
-
-
-/* задание контейнера вершин */
-struct type_point
+void reshape(GLint w, GLint h)
 {
-	GLint x, y;
-	type_point(GLint _x, GLint _y) { x = _x; y = _y; }
-};
-vector <type_point> Points;
+	if (!raytracer_mode)
+	{
+		//изменяем размеры окна
+		width = w;
+		height = h;
 
-/* Функция вывода на экран */
-void Display(void)
-{
-	glClearColor(0.5, 0.5, 0.5, 1); glClear(GL_COLOR_BUFFER_BIT);
-	glColor3ub(ColorR, ColorG, ColorB);
-	glPointSize(PointSize);
-	glBegin(GL_POINTS);
-	for (int i = 0; i<Points.size(); i++)
-		glVertex2i(Points[i].x, Points[i].y);
-	glEnd();
+		/* вычисляем соотношение между шириной и высотой */
 
-	glFinish();
+		//предотвращаем деление на 0
+		if (height == 0)
+			height = 1;
+		ratio = 1. * width / height;
+
+		//устанавливаем матрицу проекции (определяет объем сцены)
+		glMatrixMode(GL_PROJECTION);
+
+		//загружаем единичную матрицу
+		glLoadIdentity();
+
+		//определяем окно просмотра
+		glViewport(0, 0, width, height);
+
+		//перспективная проекция
+		gluPerspective(60, ratio, 0.1f, 100.0f);
+
+		//возвращаемся к матрице модели
+		glMatrixMode(GL_MODELVIEW);
+	}
+	else
+	{
+		//меняем размеры окна
+		width = w;
+		height = h;
+
+		if (height == 0)
+			height = 1;
+		ratio = 1. * width / height;
+
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glViewport(0, 0, width, height);
+		gluOrtho2D(0.0, width, 0.0, height);
+	}
 }
 
-/* Функция изменения размеров окна */
-void Reshape(GLint w, GLint h)
+//отрисовка сетки
+void draw_grid()
 {
-	Width = w;    Height = h;
-	glViewport(0, 0, w, h);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, w, 0, h, -1.0, 1.0);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
+	glColor3ub(0, 255, 0);
+	for (float i = -50; i <= 50; i += 1)
+	{
+		glBegin(GL_LINES);
+
+		//ось Х
+		glVertex3f(-50, 0, i);
+		glVertex3f(50, 0, i);
+
+		//ось Z
+		glVertex3f(i, 0, -50);
+		glVertex3f(i, 0, 50);
+		glEnd();
+	}
 }
 
-/* Функция обработки сообщений от клавиатуры */
-void Keyboard(unsigned char key, int x, int y)
+//отрисовка на экран
+void display(void)
 {
-	int i, n = Points.size();
+	//очистка буфера цвета и глубины
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	/* Изменение RGB-компонент цвета точек */
-	if (key == 'r') ColorR += 5;
-	if (key == 'g') ColorG += 5;
-	if (key == 'b') ColorB += 5;
+	//включаем буфер глубины
+	glEnable(GL_DEPTH_TEST);
 
-	/* Изменение XY-кординат точек */
-	if (key == 'w') for (i = 0; i<n; i++) Points[i].y += 5;
-	if (key == 's') for (i = 0; i<n; i++) Points[i].y -= 5;
-	if (key == 'a') for (i = 0; i<n; i++) Points[i].x -= 5;
-	if (key == 'd') for (i = 0; i<n; i++) Points[i].x += 5;
+	//обнуляем трансформации (т.е. загружаем единичную матрицу)
+	glLoadIdentity();
 
-	/* Изменение размера точек */
-	if (key == 'u') PointSize++;
-	if (key == 'i') PointSize--;
+	//устанавливаем вид камеры
+	gluLookAt(camera.Position.x, camera.Position.y, camera.Position.z,
+		camera.View.x, camera.View.y, camera.View.z,
+		camera.UpVector.x, camera.UpVector.y, camera.UpVector.z);
+
+	//отрисовка сетки
+	draw_grid();
+
+	//отрисовка сцены
+	scene.Draw();
+
+	//если включен режим трассировки
+	if (raytracer_mode)
+	{
+		//устанавливаем параметры трассировщика
+		raytracer = Raytracer(camera.Position, scene, camera, ratio, width, height, 1);
+
+		//запустить трассировку
+		raytracer.Raytrace();
+	}
 
 	glutPostRedisplay();
 
-	char v[50]; sprintf(v, "Текущий цвет всех точек: R=%.3d G=%.3d B=%.3d", ColorR, ColorG, ColorB);
-	glutSetWindowTitle(v);
+	//сменить буфер
+	glutSwapBuffers();
 }
 
-/* Функция обработки сообщения от мыши */
-void Mouse(int button, int state, int x, int y)
+//реакция на движение мыши
+void mouse_move(int x, int y)
 {
-	/* клавиша была нажата, но не отпущена */
-	if (state != GLUT_DOWN) return;
+	if (rot)
+		camera.SetViewByMouse(width, height);
+}
 
-	/* новая точка по левому клику */
-	if (button == GLUT_LEFT_BUTTON)
+//реакция на нажатие клавиш клавиатуры
+void press_key(unsigned char key, int x, int y)
+{
+	//включение/выключение вращения камеры мышью
+	if (key == 'q' || key == 'Q')
 	{
-		type_point p(x, Height - y);
-		Points.push_back(p);
-	}
-	/* удаление последней точки по центральному клику */
-	if (button == GLUT_MIDDLE_BUTTON)
-	{
-		Points.pop_back();
+		rot = !rot;
+		ShowCursor(!rot);
 	}
 
+	//включение/выключение трассировки
+	if (key == 't' || key == 'T')
+	{
+		raytracer_mode = !raytracer_mode;
+		if (!raytracer_mode)
+			reshape(width, height);
+	}
+
+	//включение/выключение режима включения/исключения фигур
+	if (key == 'c' || key == 'C')
+	{
+		//переключить режим
+		scene.add_del = !scene.add_del;
+
+		//если режим включен
+		if (scene.add_del)
+		{
+			//задать начальные установки
+			scene.sphere_mod = true;
+			scene.tetrahedron_mod = false;
+			scene.active_Sphere = 0;
+			scene.active_Tetrahedron = 0;
+		}
+
+		else
+		{
+			scene.sphere_mod = false;
+			scene.tetrahedron_mod = false;
+		}
+	}
+
+	//включить исключить фигуру
+	if (key == 'e' || key == 'E')
+	{
+		//если включен режим включения/исключения фигур
+		if (scene.add_del)
+		{
+			if (scene.sphere_mod)
+				scene.vector_Sphere[scene.active_Sphere].display = !scene.vector_Sphere[scene.active_Sphere].display;
+
+			if (scene.tetrahedron_mod)
+				scene.vector_Tetrahedron[scene.active_Tetrahedron].display = !scene.vector_Tetrahedron[scene.active_Tetrahedron].display;
+		}
+	}
+
+	//движение камеры
+	if (key == 'w' || key == 'W')
+	{
+		camera.MoveCamera(kSpeed);
+	}
+	if (key == 's' || key == 'S')
+	{
+		camera.MoveCamera(-kSpeed);
+	}
+	if (key == 'a' || key == 'A')
+	{
+		camera.RotateAroundPoint(camera.View, -kSpeed * 2.0f, 0.0f, 1.0f, 0.0f);
+	}
+	if (key == 'd' || key == 'D')
+	{
+		camera.RotateAroundPoint(camera.View, kSpeed*2.0f, 0.0f, 1.0f, 0.0f);
+	}
+
+	//перемещение источника света
+	if (key == '8')
+	{
+		scene.vector_Light[0].position.y++;
+		printf("%0.0f %0.0f %0.0f\n", scene.vector_Light[0].position.x, scene.vector_Light[0].position.y, scene.vector_Light[0].position.z);
+	}
+	if (key == '5')
+	{
+		scene.vector_Light[0].position.y--;
+		printf("%0.0f %0.0f %0.0f\n", scene.vector_Light[0].position.x, scene.vector_Light[0].position.y, scene.vector_Light[0].position.z);
+	}
+	if (key == '7')
+	{
+		scene.vector_Light[0].position.x++;
+		printf("%0.0f %0.0f %0.0f\n", scene.vector_Light[0].position.x, scene.vector_Light[0].position.y, scene.vector_Light[0].position.z);
+	}
+	if (key == '4')
+	{
+		scene.vector_Light[0].position.x--;
+		printf("%0.0f %0.0f %0.0f\n", scene.vector_Light[0].position.x, scene.vector_Light[0].position.y, scene.vector_Light[0].position.z);
+	}
+	if (key == '9')
+	{
+		scene.vector_Light[0].position.z++;
+		printf("%0.0f %0.0f %0.0f\n", scene.vector_Light[0].position.x, scene.vector_Light[0].position.y, scene.vector_Light[0].position.z);
+	}
+	if (key == '6')
+	{
+		scene.vector_Light[0].position.z--;
+		printf("%0.0f %0.0f %0.0f\n", scene.vector_Light[0].position.x, scene.vector_Light[0].position.y, scene.vector_Light[0].position.z);
+	}
+
+}
+
+void press_special_key(int key, int x, int y)
+{
+	//переключать фигуры вперед
+	if (key == GLUT_KEY_UP)
+	{
+		if (scene.add_del)
+			scene.switch_forward();
+	}
+
+	//переключать фигуры назад
+	if (key == GLUT_KEY_DOWN)
+	{
+		if (scene.add_del)
+			scene.switch_backward();
+	}
+
+	//сменить активный контейнер фигур
+	if (key == GLUT_KEY_LEFT)
+	{
+		if (scene.add_del)
+			if (scene.sphere_mod)
+			{
+				if (scene.vector_Tetrahedron.size()>0)
+				{
+					scene.sphere_mod = false;
+					scene.tetrahedron_mod = true;
+				}
+			}
+			else
+			{
+				if (scene.vector_Sphere.size()>0)
+				{
+					scene.sphere_mod = true;
+					scene.tetrahedron_mod = false;
+				}
+			}
+	}
 	glutPostRedisplay();
 }
 
-void Menu(int pos)
+//иницализация
+void init()
 {
-	int key = (keys)pos;
-
-	switch (key)
-	{
-		case KeyR: Keyboard('r', 0, 0); break;
-		case KeyG: Keyboard('g', 0, 0); break;
-		case KeyB: Keyboard('b', 0, 0); break;
-		case KeyW: Keyboard('w', 0, 0); break;
-		case KeyS: Keyboard('s', 0, 0); break;
-		case KeyA: Keyboard('a', 0, 0); break;
-		case KeyD: Keyboard('d', 0, 0); break;
-		case KeyU: Keyboard('u', 0, 0); break;
-		case KeyI: Keyboard('i', 0, 0); break;
-
-		default:
-			int menu_color = glutCreateMenu(Menu);
-			glutAddMenuEntry("Компонента R", KeyR);
-			glutAddMenuEntry("Компонента G", KeyG);
-			glutAddMenuEntry("Компонента B", KeyB);
-
-			int menu_move = glutCreateMenu(Menu);
-			glutAddMenuEntry("Вверх",  KeyW);
-			glutAddMenuEntry("Вниз",   KeyS);
-			glutAddMenuEntry("Bлево",  KeyA);
-			glutAddMenuEntry("Вправо", KeyD);
-
-			int menu_size = glutCreateMenu(Menu);
-			glutAddMenuEntry("Увеличить", KeyU);
-			glutAddMenuEntry("Уменьшить", KeyI);
-
-			int menu = glutCreateMenu(Menu);
-			glutAddSubMenu("Смена цвета", menu_color);
-			glutAddSubMenu("Перемещение", menu_move);
-			glutAddSubMenu("Изменение размера точки", menu_size);
-
-			glutAttachMenu(GLUT_RIGHT_BUTTON);
-			Keyboard(Empty,0,0);
-	}
+	ratio = 1. * width / height;
+	camera.PositionCamera(-12.0f, 4.0f, -3.0f, -5.5f, 1.0f, -1.5f, 0.0f, 1.0f, 0.0f);	//установка начальной позиции камеры
 }
 
-
-/* Головная программа */
-void main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
+	width = 500;
+	height = 500;
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_RGB);
-	glutInitWindowSize(Width, Height);
-	glutCreateWindow("Текущий цвет всех точек:");
-	Menu(Empty);
-	glutDisplayFunc(Display);
-	glutReshapeFunc(Reshape);
-	glutKeyboardFunc(Keyboard);
-	glutMouseFunc(Mouse);
+
+	//включить буфер глубины/двойную буферизацию
+	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
+	glutInitWindowSize(width, height);
+	glutCreateWindow("pure.zlo");
+	init();								//начальные установки
+
+	glutKeyboardFunc(press_key);		//обработка клавиш с кодами ascii
+	glutSpecialFunc(press_special_key);		//обработка не-ascii клавиш
+
+	glutDisplayFunc(display);
+	glutReshapeFunc(reshape);
+
+	glutPassiveMotionFunc(mouse_move);
 
 	glutMainLoop();
 }

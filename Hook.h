@@ -15,6 +15,9 @@ using namespace std;
 
 GLint width, height;	//ширина и высота окна
 GLfloat ratio;			//соотношение ширины и высоты окна
+Camera camera;			//камера
+Scene scene;			//сцена
+Raytracer raytracer;	//трассировщик
 
 bool rot = false;			//включить вращение камеры с помощью мыши
 
