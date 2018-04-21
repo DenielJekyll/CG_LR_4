@@ -90,6 +90,7 @@
     <ClInclude Include="helpTracer.h" />
     <ClInclude Include="gauss.h" />
     <ClInclude Include="Hook.h" />
+    <ClInclude Include="scene.h" />
     <ClInclude Include="tracer.h" />
     <ClInclude Include="normals.h" />
   </ItemGroup>
